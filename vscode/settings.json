@@ -1,0 +1,178 @@
+{
+  // ==========================================
+  // 1. Core Editor & Typography
+  // ==========================================
+  "editor.fontFamily": "'JetBrains Mono', 'FiraCode Nerd Font', 'Fira Code', Consolas, 'Courier New', monospace",
+  "editor.fontSize": 15,
+  "editor.lineHeight": 1.5,
+  "editor.fontLigatures": true,
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.smoothScrolling": true,
+  "editor.minimap.enabled": false,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "editor.linkedEditing": true,
+  "editor.stickyScroll.enabled": true,
+  "editor.renderWhitespace": "selection",
+  "editor.inlayHints.enabled": "onUnlessPressed",
+  // ==========================================
+  // 2. Formatting & File Management
+  // ==========================================
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": false,
+  "files.autoSave": "onFocusChange",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "keyboard.dispatch": "keyCode",
+  // ==========================================
+  // 3. Workbench & Visual UI
+  // ==========================================
+  "workbench.startupEditor": "none",
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.colorTheme": "Tokyo Night Storm",
+  "workbench.tree.indent": 16,
+  "workbench.editor.empty.hint": "hidden",
+  "workbench.editor.limit.enabled": true,
+  "workbench.editor.limit.value": 10,
+  "workbench.editor.limit.perEditorGroup": true,
+  "window.menuBarVisibility": "classic",
+  "explorer.compactFolders": false,
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+  // ==========================================
+  // 4. Integrated Terminal
+  // ==========================================
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.fontFamily": "'FiraCode Nerd Font', 'Fira Code', Consolas, monospace",
+  "terminal.integrated.fontLigatures.enabled": true,
+  "terminal.integrated.enableMultiLinePasteWarning": "never",
+  "terminal.integrated.smoothScrolling": true,
+  "terminal.integrated.scrollback": 10000,
+  "terminal.integrated.profiles.windows": {
+    "PowerShell": {
+      "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe"
+    },
+    "Command Prompt": {
+      "path": [
+        "${env:windir}\\Sysnative\\cmd.exe",
+        "${env:windir}\\System32\\cmd.exe"
+      ],
+      "args": [],
+      "icon": "terminal-cmd"
+    },
+    "Git Bash": {
+      "source": "Git Bash",
+      "icon": "terminal-git-bash"
+    },
+    "MSYS2 UCRT": {
+      "path": "cmd.exe",
+      "args": [
+        "/c",
+        "C:\\msys64\\msys2_shell.cmd -defterm -here -no-start -ucrt64"
+      ]
+    }
+  },
+  // ==========================================
+  // 5. Version Control (Git & GitLens)
+  // ==========================================
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.pruneOnFetch": true,
+  "git.enableSmartCommit": true,
+  "git.suggestSmartCommit": false,
+  "git.inputValidation": true,
+  "git.enableCommitSigning": true,
+  "git.rebaseWhenSync": true,
+  "git.terminalAuthentication": true,
+  "git.openDiffOnClick": true,
+  "gitlens.ai.model": "vscode",
+  "gitlens.ai.vscode.model": "copilot:gpt-4.1",
+  "diffEditor.codeLens": true,
+  "diffEditor.renderSideBySide": true,
+  "diffEditor.ignoreTrimWhitespace": false,
+  // ==========================================
+  // 6. AI Assistants & Chat Integrations
+  // ==========================================
+  "github.copilot.enable": {
+    "*": false,
+    "plaintext": false,
+    "markdown": false,
+    "scminput": false,
+    "c": true,
+    "javascript": true,
+    "cpp": false,
+    "html": true
+  },
+  "github.copilot.chat.agent.autoFix": true,
+  "geminicodeassist.project": "turnkey-wave-3sdxz",
+  "geminicodeassist.agentDebugMode": true,
+  "geminicodeassist.enableTelemetry": false,
+  "geminicodeassist.inlineSuggestions.enableAuto": false,
+  "chat.mcp.gallery.enabled": true,
+  "chat.mcp.autostart": "never",
+  "chat.viewSessions.orientation": "stacked",
+  "chat.sessionSync.enabled": true,
+  // ==========================================
+  // 7. Extensions & Tooling Configuration
+  // ==========================================
+  "redhat.telemetry.enabled": false,
+  "liveServer.settings.donotShowInfoMsg": true,
+  "C_Cpp.default.compilerPath": "",
+  "C_Cpp.default.cppStandard": "c++17",
+  "C_Cpp.autocompleteAddParentheses": true,
+  "C_Cpp.clang_format_style": "{ BasedOnStyle: LLVM, IndentWidth: 4, BreakBeforeBraces: Attach, AllowShortFunctionsOnASingleLine: None, AllowShortBlocksOnASingleLine: Never }",
+  "cmake.generator": "",
+  "cmake.showConfigureWithDebuggerNotification": false,
+  "cmake.debugConfig": {
+    "cwd": "${workspaceFolder}\\data",
+    "console": "internalConsole"
+  },
+  // ==========================================
+  // 8. Language-Specific Defaults
+  // ==========================================
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.requireConfig": false,
+  "prettier.singleQuote": true,
+  "prettier.semi": true,
+  "prettier.tabWidth": 2,
+  "prettier.trailingComma": "es5",
+  "prettier.printWidth": 100,
+  "prettier.bracketSpacing": true,
+  "prettier.arrowParens": "always",
+  "prettier.endOfLine": "lf",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}

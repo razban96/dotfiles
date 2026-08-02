@@ -1,0 +1,65 @@
+[user]
+    name = Chiurtu Andrei Razvan
+    email = razvan14chiurtu@gmail.com
+
+[init]
+    defaultBranch = main
+
+[core]
+    autocrlf = true
+    safecrlf = false
+    editor = code --wait
+    longpaths = true
+    fscache = true
+    preloadindex = true
+    excludesfile = ~/.gitignore_global
+
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
+
+[pull]
+    rebase = true
+
+[rebase]
+    autoStash = true
+
+[push]
+    autoSetupRemote = true
+    default = simple
+
+[fetch]
+    prune = true
+    pruneTags = true
+
+[diff]
+    algorithm = histogram
+    colorWords = true
+    renames = true
+    tool = vscode
+
+[difftool "vscode"]
+    cmd = code --wait --diff "$LOCAL" "$REMOTE"
+
+[merge]
+    tool = vscode
+
+[mergetool "vscode"]
+    cmd = code --wait "$MERGED"
+
+[column]
+    ui = auto
+
+[branch]
+    sort = -committerdate
+
+[alias]
+    st = status -sb
+    co = checkout
+    br = branch
+    cm = commit -m
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    unstage = reset HEAD --
+    last = log -1 HEAD
