@@ -36,13 +36,6 @@ install_git() {
     link_with_backup "$DOTFILES_DIR/common/git/.gitignore_global" "$HOME/.gitignore_global"
 }
 
-install_bash() {
-    echo -e "\n--> Installing [Common] bash..."
-    for file in .bashrc .bash_profile; do
-        link_with_backup "$DOTFILES_DIR/common/bash/$file" "$HOME/$file"
-    done
-}
-
 install_code() {
     echo -e "\n--> Installing [Common] code (.clang-format)..."
     link_with_backup "$DOTFILES_DIR/common/code/.clang-format" "$HOME/.clang-format"
@@ -51,11 +44,21 @@ install_code() {
 install_shell() {
     echo -e "\n--> Installing [Common] shell (.aliases)..."
     link_with_backup "$DOTFILES_DIR/common/shell/.aliases" "$HOME/.aliases"
+    # Append source hook to existing Kali ~/.bashrc instead of overwriting Kali's prompt/completions
+    if [[ -f "$HOME/.bashrc" ]] && ! grep -q "starship init bash" "$HOME/.bashrc"; then
+        printf '\n[ -f ~/.aliases ] && . ~/.aliases\ncommand -v starship &>/dev/null && eval "$(starship init bash)"\n' >> "$HOME/.bashrc"
+        echo "  [APPENDED] Aliases & Starship hooks added to existing ~/.bashrc"
+    fi
 }
 
 install_starship() {
     echo -e "\n--> Installing [Common] starship..."
     link_with_backup "$DOTFILES_DIR/common/starship/starship.toml" "$HOME/.config/starship.toml"
+}
+
+install_linux_git() {
+    echo -e "\n--> Installing [Linux] git-local..."
+    link_with_backup "$DOTFILES_DIR/linux/git/.gitconfig.local" "$HOME/.gitconfig.local"
 }
 
 install_tmux() {
@@ -70,13 +73,13 @@ install_zsh() {
 
 install_all_common() {
     install_git
-    install_bash
     install_code
     install_shell
     install_starship
 }
 
 install_all_linux() {
+    install_linux_git
     install_tmux
     install_zsh
 }
@@ -98,10 +101,10 @@ case "${mode^^}" in
   [C] All Common modules
   [L] All Linux modules
   [1] [Common] git (.gitconfig, .gitignore_global)
-  [2] [Common] bash (.bashrc, .bash_profile)
-  [3] [Common] code (.clang-format)
-  [4] [Common] shell (.aliases)
-  [5] [Common] starship (starship.toml)
+  [2] [Common] code (.clang-format)
+  [3] [Common] shell (.aliases + source hooks)
+  [4] [Common] starship (starship.toml)
+  [5] [Linux]  git-local (.gitconfig.local)
   [6] [Linux]  tmux (.tmux.conf)
   [7] [Linux]  zsh (.zshrc)
   [0] Exit
@@ -112,10 +115,10 @@ EOF
                 C) install_all_common ;;
                 L) install_all_linux ;;
                 1) install_git ;;
-                2) install_bash ;;
-                3) install_code ;;
-                4) install_shell ;;
-                5) install_starship ;;
+                2) install_code ;;
+                3) install_shell ;;
+                4) install_starship ;;
+                5) install_linux_git ;;
                 6) install_tmux ;;
                 7) install_zsh ;;
                 *) echo "Invalid selection." ;;

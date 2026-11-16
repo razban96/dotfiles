@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 
 $ErrorActionPreference = "Stop"
-$DotfilesPath   = "C:\dotfiles"
+$DotfilesPath   = $PSScriptRoot
 $WTSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 
 function Sync-FileToRepo {
@@ -40,9 +40,9 @@ $BackupModules = [ordered]@{
     }
     "2" = @{
         Scope  = "Common"
-        Name   = "bash (.bashrc, .bash_profile, .minttyrc)"
+        Name   = "bash (.bashrc, .bash_profile)"
         Action = {
-            foreach ($File in @(".bashrc", ".bash_profile", ".minttyrc")) {
+            foreach ($File in @(".bashrc", ".bash_profile")) {
                 Sync-FileToRepo "$HOME\$File" "$DotfilesPath\common\bash\$File"
             }
         }
@@ -65,30 +65,38 @@ $BackupModules = [ordered]@{
         Scope  = "Common"
         Name   = "starship (starship.toml)"
         Action = {
-            Sync-FileToRepo "$DotfilesPath\.config\starship.toml" "$DotfilesPath\common\starship\starship.toml"
+            Sync-FileToRepo "$HOME\.config\starship.toml" "$DotfilesPath\common\starship\starship.toml"
         }
     }
     "6" = @{
         Scope  = "Windows"
-        Name   = "powershell (Microsoft.PowerShell_profile.ps1)"
+        Name   = "git-local (.gitconfig.local + .minttyrc)"
         Action = {
-            Sync-FileToRepo $PROFILE.CurrentUserAllHosts "$DotfilesPath\windows\powershell\Microsoft.PowerShell_profile.ps1"
+            Sync-FileToRepo "$HOME\.gitconfig.local" "$DotfilesPath\windows\git\.gitconfig.local"
+            Sync-FileToRepo "$HOME\.minttyrc"        "$DotfilesPath\windows\bash\.minttyrc"
         }
     }
     "7" = @{
+        Scope  = "Windows"
+        Name   = "powershell (Microsoft.PowerShell_profile.ps1)"
+        Action = {
+            Sync-FileToRepo $PROFILE.CurrentUserCurrentHost "$DotfilesPath\windows\powershell\Microsoft.PowerShell_profile.ps1"
+        }
+    }
+    "8" = @{
         Scope  = "Windows"
         Name   = "terminal (Windows Terminal settings.json)"
         Action = {
             Sync-FileToRepo $WTSettingsPath "$DotfilesPath\windows\terminal\settings.json"
         }
     }
-    "8" = @{
+    "9" = @{
         Scope  = "Windows"
         Name   = "manifests (Export WinGet packages list)"
         Action = {
-            $ManifestFile = "$DotfilesPath\windows\manifests\winget-packages.json"
+            $ManifestFile = Join-Path $DotfilesPath "windows\manifests\winget-packages.json"
             if (Get-Command winget -ErrorAction SilentlyContinue) {
-                winget export -o $ManifestFile --accept-source-agreements | Out-Null
+                winget export -o $ManifestFile --force --accept-source-agreements --disable-interactivity | Out-Null
                 Write-Host "  [EXPORTED] WinGet manifest -> $ManifestFile" -ForegroundColor Green
             } else {
                 Write-Host "  [SKIP] winget not found." -ForegroundColor Red

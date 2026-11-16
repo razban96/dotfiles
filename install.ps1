@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 #Requires -RunAsAdministrator
 
-$DotfilesPath   = "C:\dotfiles"
+$DotfilesPath   = $PSScriptRoot
 $WTSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 $TimeStamp      = Get-Date -Format "dd.MM.yyyy_HH.mm.ss"
 $BackupDir      = "$HOME\dotfiles_backup_$TimeStamp"
@@ -52,9 +52,9 @@ $Modules = [ordered]@{
     }
     "2" = @{
         Scope  = "Common"
-        Name   = "bash (.bashrc, .bash_profile, .minttyrc)"
+        Name   = "bash (.bashrc, .bash_profile)"
         Action = {
-            foreach ($File in @(".bashrc", ".bash_profile", ".minttyrc")) {
+            foreach ($File in @(".bashrc", ".bash_profile")) {
                 New-SymlinkWithBackup "$HOME\$File" "$DotfilesPath\common\bash\$File"
             }
         }
@@ -77,17 +77,25 @@ $Modules = [ordered]@{
         Scope  = "Common"
         Name   = "starship (starship.toml)"
         Action = {
-            New-SymlinkWithBackup "$DotfilesPath\.config\starship.toml" "$DotfilesPath\common\starship\starship.toml"
+            New-SymlinkWithBackup "$HOME\.config\starship.toml" "$DotfilesPath\common\starship\starship.toml"
         }
     }
     "6" = @{
         Scope  = "Windows"
-        Name   = "powershell (Microsoft.PowerShell_profile.ps1)"
+        Name   = "git-local (.gitconfig.local + .minttyrc)"
         Action = {
-            New-SymlinkWithBackup $PROFILE.CurrentUserAllHosts "$DotfilesPath\windows\powershell\Microsoft.PowerShell_profile.ps1"
+            New-SymlinkWithBackup "$HOME\.gitconfig.local" "$DotfilesPath\windows\git\.gitconfig.local"
+            New-SymlinkWithBackup "$HOME\.minttyrc"        "$DotfilesPath\windows\bash\.minttyrc"
         }
     }
     "7" = @{
+        Scope  = "Windows"
+        Name   = "powershell (Microsoft.PowerShell_profile.ps1)"
+        Action = {
+            New-SymlinkWithBackup $PROFILE.CurrentUserCurrentHost "$DotfilesPath\windows\powershell\Microsoft.PowerShell_profile.ps1"
+        }
+    }
+    "8" = @{
         Scope  = "Windows"
         Name   = "terminal (Windows Terminal settings.json)"
         Action = {

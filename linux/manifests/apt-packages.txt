@@ -1,0 +1,5 @@
+# Kali Linux core CLI packages
+git
+tmux
+starship
+ripgrep

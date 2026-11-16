@@ -2,7 +2,7 @@
 #Requires -RunAsAdministrator
 
 $ErrorActionPreference = "Stop"
-$ManifestFile = "C:\dotfiles\windows\manifests\winget-packages.json"
+$ManifestFile = Join-Path $PSScriptRoot "windows\manifests\winget-packages.json"
 
 if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
     Write-Error "WinGet is not installed or not in PATH."

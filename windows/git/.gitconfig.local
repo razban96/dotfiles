@@ -1,0 +1,10 @@
+[core]
+    autocrlf = true
+    filemode = false
+    fscache = true
+    fsmonitor = true
+    editor = clion --wait
+[diff]
+    tool = clion
+[difftool "clion"]
+    cmd = clion diff "$LOCAL" "$REMOTE"
