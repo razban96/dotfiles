@@ -70,7 +70,7 @@ if (Test-Path $VSCodeUserPath) {
     New-SymlinkWithBackup -LinkPath "$VSCodeUserPath\snippets"         -TargetPath "$DotfilesPath\common\vscode\snippets"
 
     $ExtensionsFile = "$DotfilesPath\common\vscode\extensions.txt"
-    if (Test-Path $ExtensionsFile) {
+    if ((Test-Path $ExtensionsFile) -and (Get-Command code -ErrorAction SilentlyContinue)) {
         Write-Host "`nInstalling VS Code Extensions..." -ForegroundColor Cyan
         Get-Content $ExtensionsFile | ForEach-Object {
             $Extension = $_.Trim()
