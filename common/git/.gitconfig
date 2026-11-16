@@ -6,14 +6,16 @@
     defaultBranch = main
 
 [core]
-    autocrlf = true
-    safecrlf = false
-    editor = code --wait
+	autocrlf = true
+    safecrlf = warn
+    editor = clion --wait
     longpaths = true
     fscache = true
     preloadindex = true
+    fsmonitor = true
+    untrackedCache = true
+    filemode = false
     excludesfile = ~/.gitignore_global
-
 [filter "lfs"]
     clean = git-lfs clean -- %f
     smudge = git-lfs smudge -- %f
@@ -25,6 +27,12 @@
 
 [rebase]
     autoStash = true
+
+[merge]
+    conflictStyle = zdiff3
+
+[rerere]
+    enabled = true
 
 [push]
     autoSetupRemote = true
@@ -38,16 +46,11 @@
     algorithm = histogram
     colorWords = true
     renames = true
-    tool = vscode
+    tool = clion
 
-[difftool "vscode"]
-    cmd = code --wait --diff "$LOCAL" "$REMOTE"
-
-[merge]
-    tool = vscode
-
-[mergetool "vscode"]
-    cmd = code --wait "$MERGED"
+[difftool "clion"]
+    cmd = clion diff "$LOCAL" "$REMOTE"
+    prompt = false
 
 [column]
     ui = auto

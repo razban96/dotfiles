@@ -1,70 +1,73 @@
-#!/bin/bash
-# Linux Dotfiles Installation Script for git, vscode, bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-DOTFILES_DIR="$HOME/dotfiles"
-TIMESTAMP=$(date +"%d.%m.%Y_%H.%M.%S")
-BACKUP_DIR="$HOME/dotfiles_backup_$TIMESTAMP"
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BACKUP_DIR="$HOME/dotfiles_backup_$(date +%d.%m.%Y_%H.%M.%S)"
+VSCODE_USER_DIR="$HOME/.config/Code/User"
 
-# 1. Interactive Safety Prompt
-read -p "This script will link system configs to $DOTFILES_DIR. Continue? (y/N) " confirm
+read -rp "This script will link Linux configs to $DOTFILES_DIR. Continue? (y/N): " confirm
 if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-    echo -e "\e[33mOperation cancelled by user.\e[0m"
-    exit 1
+    echo "Operation cancelled."
+    exit 0
 fi
 
-# 2. Backup Helper Function
 link_with_backup() {
-    local LINK_PATH=$1
-    local TARGET_PATH=$2
+    local target="$1"
+    local link_path="$2"
 
-    if [ ! -e "$TARGET_PATH" ]; then
-        echo -e "\e[31mSource target missing: $TARGET_PATH\e[0m"
+    if [[ ! -e "$target" ]]; then
+        echo "[SKIP] Source missing: $target"
         return
     fi
 
-    if [ -e "$LINK_PATH" ] || [ -L "$LINK_PATH" ]; then
-        if [ ! -L "$LINK_PATH" ]; then
-            mkdir -p "$BACKUP_DIR"
-            mv "$LINK_PATH" "$BACKUP_DIR/"
-            echo -e "\e[33mBacked up existing $(basename "$LINK_PATH")\e[0m"
-        else
-            rm "$LINK_PATH"
-        fi
+    mkdir -p "$(dirname "$link_path")"
+
+    if [[ -L "$link_path" && "$(readlink -f "$link_path")" == "$(readlink -f "$target")" ]]; then
+        echo "[OK] Already linked: $link_path"
+        return
     fi
 
-    ln -s "$TARGET_PATH" "$LINK_PATH"
-    echo -e "\e[32mSymlink created: $LINK_PATH\e[0m"
+    if [[ -e "$link_path" || -L "$link_path" ]]; then
+        mkdir -p "$BACKUP_DIR"
+        mv "$link_path" "$BACKUP_DIR/"
+        echo "[BACKUP] Moved existing $(basename "$link_path") -> $BACKUP_DIR"
+    fi
+
+    ln -s "$target" "$link_path"
+    echo "[LINKED] $link_path -> $target"
 }
 
-# 3. Create Bash Symlinks
-echo -e "\n\e[36mSetting up Bash configurations...\e[0m"
+echo -e "\nSetting up Common configurations..."
+link_with_backup "$DOTFILES_DIR/common/git/.gitconfig"        "$HOME/.gitconfig"
+link_with_backup "$DOTFILES_DIR/common/git/.gitignore_global" "$HOME/.gitignore_global"
+link_with_backup "$DOTFILES_DIR/common/code/.clang-format"    "$HOME/.clang-format"
+
 for file in .bashrc .bash_profile .bash_aliases .bash_logout; do
-    link_with_backup "$HOME/$file" "$DOTFILES_DIR/bash/$file"
+    link_with_backup "$DOTFILES_DIR/common/bash/$file" "$HOME/$file"
 done
 
-# 4. Create Git Symlinks
-echo -e "\n\e[36mSetting up Git configurations...\e[0m"
-link_with_backup "$HOME/.gitconfig" "$DOTFILES_DIR/git/.gitconfig"
-link_with_backup "$HOME/.gitignore_global" "$DOTFILES_DIR/git/.gitignore_global"
+echo -e "\nSetting up Linux-specific configurations..."
+if [[ -d "$DOTFILES_DIR/linux" ]]; then
+    for file in .zshrc .aliases; do
+        link_with_backup "$DOTFILES_DIR/linux/$file" "$HOME/$file"
+    done
+fi
 
-# 5. Create VS Code Symlinks & Install Extensions
-VSCODE_PATH="$HOME/.config/Code/User"
-if [ -d "$(dirname "$VSCODE_PATH")" ]; then
-    echo -e "\n\e[36mSetting up VS Code configurations...\e[0m"
-    mkdir -p "$VSCODE_PATH"
-    link_with_backup "$VSCODE_PATH/settings.json" "$DOTFILES_DIR/vscode/settings.json"
-    link_with_backup "$VSCODE_PATH/keybindings.json" "$DOTFILES_DIR/vscode/keybindings.json"
-    link_with_backup "$VSCODE_PATH/snippets" "$DOTFILES_DIR/vscode/snippets"
+if command -v code >/dev/null 2>&1; then
+    echo -e "\nSetting up VS Code configurations..."
+    link_with_backup "$DOTFILES_DIR/common/vscode/settings.json"    "$VSCODE_USER_DIR/settings.json"
+    link_with_backup "$DOTFILES_DIR/common/vscode/keybindings.json" "$VSCODE_USER_DIR/keybindings.json"
+    link_with_backup "$DOTFILES_DIR/common/vscode/snippets"         "$VSCODE_USER_DIR/snippets"
 
-    EXT_FILE="$DOTFILES_DIR/vscode/extensions.txt"
-    if [ -f "$EXT_FILE" ]; then
-        echo -e "\n\e[36mInstalling VS Code Extensions...\e[0m"
-        while read -r ext; do
-            if [[ -n "$ext" && ! "$ext" =~ ^# ]]; then
-                code --install-extension "$ext" --force
-            fi
+    EXT_FILE="$DOTFILES_DIR/common/vscode/extensions.txt"
+    if [[ -f "$EXT_FILE" ]]; then
+        echo -e "\nInstalling VS Code Extensions..."
+        while IFS= read -r ext || [[ -n "$ext" ]]; do
+            ext="$(echo "$ext" | xargs)"
+            [[ -z "$ext" || "$ext" == \#* ]] && continue
+            code --install-extension "$ext" --force
         done < "$EXT_FILE"
     fi
 fi
 
-echo -e "\n\e[32mDotfiles installation completed successfully.\e[0m"
+echo -e "\nDotfiles installation completed successfully."

@@ -1,48 +1,54 @@
-# Backup script for Windows 11 dotfiles git, vscode, bash
+#Requires -Version 7.0
 
-$BackupDir = "$HOME\dotfiles"
-
-# 1. Create directory structure
-New-Item -ItemType Directory -Force -Path "$BackupDir\vscode" | Out-Null
-New-Item -ItemType Directory -Force -Path "$BackupDir\git" | Out-Null
-New-Item -ItemType Directory -Force -Path "$BackupDir\bash" | Out-Null
-
-# 2. Copy Git files
-if (Test-Path "$HOME\.gitconfig") {
-    Copy-Item "$HOME\.gitconfig" -Destination "$BackupDir\git\.gitconfig" -Force
-    Write-Host "Backed up .gitconfig"
-}
-if (Test-Path "$HOME\.gitignore_global") {
-    Copy-Item "$HOME\.gitignore_global" -Destination "$BackupDir\git\.gitignore_global" -Force
-    Write-Host "Backed up .gitignore_global"
-}
-
-# 3. Copy VS Code files
+$ErrorActionPreference = "Stop"
+$DotfilesPath   = "C:\dotfiles"
 $VSCodeUserPath = "$env:APPDATA\Code\User"
-if (Test-Path "$VSCodeUserPath\settings.json") {
-    Copy-Item "$VSCodeUserPath\settings.json" -Destination "$BackupDir\vscode\settings.json" -Force
-    Write-Host "Backed up VS Code settings.json"
-}
-if (Test-Path "$VSCodeUserPath\keybindings.json") {
-    Copy-Item "$VSCodeUserPath\keybindings.json" -Destination "$BackupDir\vscode\keybindings.json" -Force
-    Write-Host "Backed up VS Code keybindings.json"
-}
-if (Test-Path "$VSCodeUserPath\snippets") {
-    Copy-Item "$VSCodeUserPath\snippets" -Destination "$BackupDir\vscode\snippets" -Recurse -Force
-    Write-Host "Backed up VS Code snippets"
+$WTSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+
+Write-Host "Syncing current Windows state into $DotfilesPath..." -ForegroundColor Cyan
+
+# 1. Export current VS Code extensions list
+$ExtensionsFile = "$DotfilesPath\common\vscode\extensions.txt"
+if (Get-Command code -ErrorAction SilentlyContinue) {
+    code --list-extensions | Sort-Object | Set-Content -Path $ExtensionsFile -Encoding UTF8
+    Write-Host "[EXPORTED] VS Code extensions -> $ExtensionsFile" -ForegroundColor Green
 }
 
-# 4. Export VS Code extensions list
-code --list-extensions > "$BackupDir\vscode\extensions.txt"
-Write-Host "Exported VS Code extensions list"
+# 2. Sync any non-symlinked local files back into C:\dotfiles (fallback if a link was broken)
+$SyncMap = @{
+    "$HOME\.gitconfig"                 = "$DotfilesPath\common\git\.gitconfig"
+    "$HOME\.gitignore_global"          = "$DotfilesPath\common\git\.gitignore_global"
+    "$HOME\.clang-format"              = "$DotfilesPath\common\code\.clang-format"
+    "$HOME\.bashrc"                    = "$DotfilesPath\common\bash\.bashrc"
+    "$HOME\.bash_profile"              = "$DotfilesPath\common\bash\.bash_profile"
+    "$HOME\.minttyrc"                  = "$DotfilesPath\common\bash\.minttyrc"
+    "$VSCodeUserPath\settings.json"    = "$DotfilesPath\common\vscode\settings.json"
+    "$VSCodeUserPath\keybindings.json" = "$DotfilesPath\common\vscode\keybindings.json"
+    $PROFILE.CurrentUserAllHosts       = "$DotfilesPath\windows\powershell\Microsoft.PowerShell_profile.ps1"
+    $WTSettingsPath                    = "$DotfilesPath\windows\terminal\settings.json"
+}
 
-# 5. Copy Bash files
-$BashFiles = @(".bashrc", ".bash_profile", ".bash_aliases", ".bash_logout")
-foreach ($File in $BashFiles) {
-    if (Test-Path "$HOME\$File") {
-        Copy-Item "$HOME\$File" -Destination "$BackupDir\bash\$File" -Force
-        Write-Host "Backed up $File"
+foreach ($entry in $SyncMap.GetEnumerator()) {
+    $livePath = $entry.Key
+    $repoPath = $entry.Value
+
+    if (Test-Path $livePath) {
+        $item = Get-Item $livePath -Force
+        if ($item.Attributes.HasFlag([System.IO.FileAttributes]::ReparsePoint) -and $item.Target -eq $repoPath) {
+            continue
+        }
+
+        $repoDir = Split-Path $repoPath -Parent
+        if (-not (Test-Path $repoDir)) {
+            New-Item -ItemType Directory -Force -Path $repoDir | Out-Null
+        }
+        Copy-Item -Path $livePath -Destination $repoPath -Force
+        Write-Host "[SYNCED] $livePath -> $repoPath" -ForegroundColor Yellow
     }
 }
 
-Write-Host "Backup process completed successfully."
+# 3. Show Git status summary
+Push-Location $DotfilesPath
+Write-Host "`nCurrent Git status in ${DotfilesPath}:" -ForegroundColor Cyan
+git status -s
+Pop-Location

@@ -1,0 +1,8 @@
+* text=auto
+*.sh text eol=lf
+.bashrc text eol=lf
+.bash_profile text eol=lf
+.gitconfig text eol=lf
+.gitignore_global text eol=lf
+.clang-format text eol=lf
+*.ps1 text eol=crlf
