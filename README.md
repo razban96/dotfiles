@@ -1,6 +1,6 @@
 # dotfiles
 
-Cross-platform configuration files and bootstrap scripts for **Windows 11** and **Kali Linux**, paired with a clean `C:` / `D:` drive separation strategy.
+Modular, cross-platform configuration repository and interactive deployment scripts for **Windows 11** and **Kali Linux**, designed around a strict `C:` / `D:` drive separation strategy.
 
 ## Repository Architecture
 
@@ -10,12 +10,20 @@ C:\dotfiles\
 │   ├── bash\                # .bashrc, .bash_profile, .minttyrc
 │   ├── code\                # .clang-format (C++ style rules)
 │   ├── git\                 # .gitconfig, .gitignore_global
-│   └── vscode\              # settings.json, keybindings.json, extensions.txt
+│   ├── shell\               # .aliases (shared shell shorthand commands)
+│   └── starship\            # starship.toml (cross-shell prompt)
 ├── windows\                 # Windows 11 specific configurations
+│   ├── manifests\           # winget-packages.json (exported system apps)
 │   ├── powershell\          # Microsoft.PowerShell_profile.ps1
 │   └── terminal\            # Windows Terminal settings.json
-├── linux\                   # Kali Linux specific overrides (.zshrc, .aliases)
+├── linux\                   # Kali Linux specific configurations
+│   ├── manifests\           # apt-packages.txt
+│   ├── tmux\                # .tmux.conf
+│   └── .zshrc               # Zsh configuration
 ├── .gitattributes           # Enforces LF on shell/dotfiles and CRLF on .ps1
-├── backup.ps1               # Exports VS Code extensions & repairs unlinked configs
-├── install.ps1              # Idempotent Windows 11 symlink bootstrapper
-└── install.sh               # Idempotent Kali Linux symlink bootstrapper
+├── .gitignore               # Ignores local backups and sensitive credentials
+├── backup.ps1               # Interactive backup & WinGet manifest exporter
+├── install.ps1              # Interactive Windows 11 symlink installer
+├── setup-packages.ps1       # Automated WinGet package restorer
+└── install.sh               # Interactive Kali Linux symlink installer
+```
