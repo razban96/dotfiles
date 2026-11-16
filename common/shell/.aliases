@@ -1,2 +1,8 @@
-# Shared cross-platform shell aliases
-
+# Shared cross-platform shell aliases (Bash & Zsh)
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias gss='git status -s'
+alias glg='git log --oneline --graph --decorate -n 15'
+alias gaa='git add -A'
+alias gcm='git commit -m'
